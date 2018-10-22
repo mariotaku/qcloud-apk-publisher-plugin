@@ -1,0 +1,30 @@
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+dependencies {
+    compile gradleApi()
+    compileOnly 'com.android.tools.build:gradle:3.2.1'
+
+    compile 'com.qcloud:cos_api:5.4.5'
+    compile 'com.tencentcloudapi:tencentcloud-sdk-java:3.0.27'
+
+    testCompile 'junit:junit:4.12'
+}
+
+repositories {
+    mavenLocal()
+    google()
+    jcenter()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.github.mariotaku'
+            artifactId 'qcloud-apk-publisher-plugin'
+            version '0.0.1-SNAPSHOT'
+
+            from components.java
+        }
+    }
+}
