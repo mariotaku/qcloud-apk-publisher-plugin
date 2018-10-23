@@ -52,6 +52,7 @@ class QCloudPublisherPlugin implements Plugin<Project> {
 
                         def origApk = output.outputFile
                         def origApkKey = apkKey(config, origApk)
+                        def mappingFile = variant.mappingFile
                         try {
                             cosClient.putObject(config.bucket, origApkKey, origApk)
                             p.logger.log(LogLevel.LIFECYCLE, "Uploaded APK: $origApkKey")
@@ -62,7 +63,7 @@ class QCloudPublisherPlugin implements Plugin<Project> {
 
                         if (config.uploadMapping && mappingFile.exists()) {
                             try {
-                                cosClient.putObject(config.bucket, mappingKey(config, variant.mappingFile), variant.mappingFile)
+                                cosClient.putObject(config.bucket, mappingKey(config, mappingFile), mappingFile)
                             } catch (e) {
                                 p.logger.error("Failed to upload mapping", e)
                             }
