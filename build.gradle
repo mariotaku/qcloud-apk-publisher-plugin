@@ -23,7 +23,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'com.github.mariotaku'
             artifactId 'qcloud-apk-publisher-plugin'
-            version '0.0.1-SNAPSHOT'
+            version '0.0.1'
 
             from components.java
         }
