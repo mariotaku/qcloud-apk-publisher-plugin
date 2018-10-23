@@ -63,7 +63,7 @@ class QCloudPublisherPlugin implements Plugin<Project> {
 
                         if (config.uploadMapping && mappingFile.exists()) {
                             try {
-                                def key = mappingKey(config, mappingFile)
+                                def key = mappingKey(config, origApk)
                                 cosClient.putObject(config.bucket, key, mappingFile)
                                 p.logger.log(LogLevel.LIFECYCLE, "Uploaded mapping: $key")
                             } catch (e) {
@@ -187,7 +187,7 @@ class QCloudPublisherPlugin implements Plugin<Project> {
         if (uploadName != null) return uploadName
         def prefix = config.keyPrefix ?: ""
         def suffix = config.keySuffix ?: ""
-        return "${prefix}mapping-${nameWithoutExtension(file)}${suffix}.${extension(file)}"
+        return "${prefix}mapping-${nameWithoutExtension(file)}${suffix}.txt"
     }
 
     static String extension(File file) {
