@@ -187,7 +187,7 @@ class QCloudPublisherPlugin implements Plugin<Project> {
         if (uploadName != null) return uploadName
         def prefix = config.keyPrefix ?: ""
         def suffix = config.keySuffix ?: ""
-        return "${prefix}mapping-${nameWithoutExtension(file)}$uploadName${suffix}.${extension(file)}"
+        return "${prefix}mapping-${nameWithoutExtension(file)}${suffix}.${extension(file)}"
     }
 
     static String extension(File file) {
