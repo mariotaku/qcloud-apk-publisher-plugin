@@ -63,7 +63,9 @@ class QCloudPublisherPlugin implements Plugin<Project> {
 
                         if (config.uploadMapping && mappingFile.exists()) {
                             try {
-                                cosClient.putObject(config.bucket, mappingKey(config, mappingFile), mappingFile)
+                                def key = mappingKey(config, mappingFile)
+                                cosClient.putObject(config.bucket, key, mappingFile)
+                                p.logger.log(LogLevel.LIFECYCLE, "Uploaded mapping: $key")
                             } catch (e) {
                                 p.logger.error("Failed to upload mapping", e)
                             }
