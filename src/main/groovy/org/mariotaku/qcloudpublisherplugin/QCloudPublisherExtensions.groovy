@@ -4,9 +4,7 @@ class QCloudPublisherExtensions {
 
     String secretId = ""
     String secretKey = ""
-    String region = "ap-guangzhou"
-
-    String edition = "basic"
+    String region = ""
 
     String bucket = ""
 
@@ -17,4 +15,8 @@ class QCloudPublisherExtensions {
 
     boolean uploadMapping = false
 
+    boolean reinforceEnabled = false
+    String reinforceEdition = "basic"
+
+    Map<String, Boolean> reinforceForVariant = null
 }

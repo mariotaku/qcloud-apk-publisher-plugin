@@ -7,6 +7,7 @@ dependencies {
 
     compile 'com.qcloud:cos_api:5.4.5'
     compile 'com.tencentcloudapi:tencentcloud-sdk-java:3.0.27'
+    compile 'com.squareup.okio:okio:2.1.0'
 
     testCompile 'junit:junit:4.12'
 }
