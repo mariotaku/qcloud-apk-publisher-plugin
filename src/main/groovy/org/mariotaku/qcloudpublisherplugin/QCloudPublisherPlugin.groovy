@@ -3,6 +3,8 @@ package org.mariotaku.qcloudpublisherplugin
 import com.android.apksig.ApkSigner
 import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.BaseVariantOutput
+import com.android.build.gradle.internal.scope.InternalArtifactType
+import com.android.build.gradle.internal.scope.VariantScope
 import com.android.builder.model.SigningConfig
 import com.android.tools.build.bundletool.model.SigningConfiguration
 import com.android.tools.build.bundletool.utils.flags.Flag
@@ -37,18 +39,14 @@ class QCloudPublisherPlugin implements Plugin<Project> {
 
                 // Bundle task name for variant
                 def publishTaskName = "qcloudPublish${variant.name.capitalize()}"
+                def publishBundleTaskName = "qcloudPublish${variant.name.capitalize()}Bundle"
 
                 p.task(publishTaskName) {
                     group = "qcloud-publish"
                     description = "Publish ${variant.name} apk to QCloud."
 
                     doLast {
-                        if (!config.secretId || !config.secretKey) throw new Exception("QCloud credentials required")
-                        if (!config.bucket) throw new Exception("Bucket required")
-                        if (!config.region) throw new Exception("Region required")
-                        def cosCred = new BasicCOSCredentials(config.secretId, config.secretKey)
-                        def cosConf = new ClientConfig(new Region(config.region))
-                        def cosClient = new COSClient(cosCred, cosConf)
+                        def cosClient = client(config)
 
                         def origApk = output.outputFile
                         def origApkKey = apkKey(config, origApk)
@@ -136,6 +134,27 @@ class QCloudPublisherPlugin implements Plugin<Project> {
 
                     dependsOn(variant.assemble)
                 }
+
+                p.task(publishBundleTaskName) {
+                    group = "qcloud-publish"
+                    description = "Publish ${variant.name} aab to QCloud."
+
+                    doLast {
+                        def cosClient = client(config)
+                        VariantScope scope = variant.variantData.scope
+                        def origAab = scope.artifacts.getArtifactFiles(InternalArtifactType.BUNDLE).files.first()
+                        def origAabKey = apkKey(config, origAab)
+                        try {
+                            cosClient.putObject(config.bucket, origAabKey, origAab)
+                            p.logger.log(LogLevel.LIFECYCLE, "Uploaded AAB: $origAabKey")
+                        } catch (e) {
+                            p.logger.error("Failed to upload AAB", e)
+                            throw e
+                        }
+                    }
+
+                    dependsOn("bundle${variant.name.capitalize()}")
+                }
             }
         }
     }
@@ -208,6 +227,15 @@ class QCloudPublisherPlugin implements Plugin<Project> {
         buffer.writeAll(Okio.source(body))
         buffer.flush()
         return sink.hash()
+    }
+
+    static COSClient client(QCloudPublisherExtensions config) {
+        if (!config.secretId || !config.secretKey) throw new Exception("QCloud credentials required")
+        if (!config.bucket) throw new Exception("Bucket required")
+        if (!config.region) throw new Exception("Region required")
+        def cosCred = new BasicCOSCredentials(config.secretId, config.secretKey)
+        def cosConf = new ClientConfig(new Region(config.region))
+        return new COSClient(cosCred, cosConf)
     }
 
 }
